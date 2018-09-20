@@ -1,0 +1,44 @@
+%%%%%-------------- Location ---------------%%%%%%%%%%%%%%%%%%%
+DLCspreadsheet='\\LEVIATHAN\Data2\WindFloat Numerical Codes\WindFloat 8MW WFATL\Detailed Design\Fatigue_Redo_May2017\DLC_table\DLCSpreadsheet_WFA_FatigueTemp2014.xlsx';
+sheetnum=9; % sheet number where the Fatigue runs are specified (need probability per bin)
+fatdir='\\LEVIATHAN\Data2\WindFloat Numerical Codes\WindFloat 8MW WFATL\Detailed Design\Fatigue_Redo_May2017\FatigueRuns_2014\'; % run directory (where all the run folders are stored)
+basename ='FatigueResults'; % number of bins and standard will be appended
+nSeeds=1; % used when labeling the worst bin/seed
+
+%%%%%-------------- Structure Properties ---------------%%%%%%%%%%%%%%%%%%%
+FatLifeYrs=25; % lifespan of structure
+Heading=225; % Only used for plotting of TwrB
+
+%%%%%-------------- Logicals ---------------%%%%%%%%%%%%%%%%%%%
+iPlot=0;
+iPolarPlot=1; % Only used for plotting of TwrB
+iVestas=0;
+iRun=0;
+iRedoRain=0;
+
+%%%%%-------------- Mooring Line or Tower Base Analysis? ---------------%%%%%%%%%%%%%%%%%%%
+fatType='TwrB'; % 'ML' or 'TwrB'
+
+%%%%%-------------- ML Parameters ---------------%%%%%%%%%%%%%%%%%%%
+standard='ABS'; %if ML, then ORQ chain is used (instead of the grade named in the Orca model)
+tcutoff=3; %[s] 
+omega=10; %[rad/s]? should just use Tfilt...
+specLines.Types={'Dyneema blah','HMPE foo'}; % exactly match the linetype name in your Orca model
+specLines.MBLs=[6550e3 65e5 ]; % this is the exact MBL to be used (if iMBL=1). Value must include effect of corrosion!!
+specLines.iMBLs=[1  1]; % if = 0, neither specified MBLs nor specified CorrR will be used (just K and m), kind of weird
+% if = 1, then MBL will be used as is and CorrR will be ignored; 
+% if = 2, then MBLs will be ignored and specified CorrR will be used.
+specLines.As = [9 3]; % this is called K in API R2SK
+specLines.Ms =[ 3 3]; % this is usually just lowercase 'm'
+specLines.CorrRs = [.4 .2]; % [mm/yr]
+%%%%%-------------- ML Parameters ---------------%%%%%%%%%%%%%%%%%%%
+
+%%%%%-------------- TwrB Parameters ---------------%%%%%%%%%%%%%%%%%%%
+m  = 3; % [-], exponent of M-N curve
+Mu = 3e6; % [kNm], M0 of the M-N curve, only used for tower base
+N0 = 1e7; %[cycles], number of total cycles throughout lifespan. With FatLifeYrs, determines frequency of DEL (sinusoidal) timeseries
+RotAngle = [30 60 120 150]; % [deg] (the angles of the arbitrary axes from +x going CCW)
+Tfilt=[3;20]; % [sec],  low end and high end of filter
+n_order=[5]; %[-], same number of columns as Tfilt (order of filter)
+%%%%%-------------- TwrB Parameters ---------------%%%%%%%%%%%%%%%%%%%
+

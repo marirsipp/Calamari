@@ -1,0 +1,48 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% INPUT FILE for buildWF.m %%%%%%%%%%%%%%%%%%%%%%%%
+%% Naming Variables
+PtfmType='WFM';
+TurbineType='GEAlstom_6MW';
+datfileIN='S:\SUP\WFM_Alstom6MW\Input_OrcaFlex\Iteration0_Flexible.dat';
+datfileOUT='S:\SUP\WFM_Alstom6MW\Input_OrcaFlex\Iteration0-1_Flexible.dat';
+OFver=9.7;
+%% Booleans
+iRigid=0; %if building flexible model (=0), must use OrcaFlex 10.0+ to connect lines to lines
+iplot=0;
+iWEP=1; %build the WEP or not
+iTurbine=1; % build the RNA+tower 
+
+% only used for Flexible Model
+iWEB=0; % build the webbing between the WEP and the LMB or not
+iRigidWEP=0; % if building a flexible model, should the WEP be attached to the column base, or be free to flex
+iMoor=0; % usually set to 0, unless you want a point mass on the base of the column representing the static mooring tension
+iLD=1; %set linear damping on the buoys
+iAdamantium=0; %if set to 1, then lines are ultra-rigid, 1000x stiffer than steel (like Wolverine's claws)
+iFAST=0;
+%% Miscellaneous
+% Rigid Parameters (+Flexible)
+CdWEP=3; % drag coefficient of the WEP plate (F_vertical = .5*rho*Cd*A_wep*U|U|)
+X1=[0 0 0]; %origin, relative to...
+
+% Flexible-only parameters (need to be set, but unused for rigid model)
+LD=[80E3	80E3	350E3	320E6	320E6	36E6]; % [ N/(m/s) N/(m/s) N/(m/s) N.m/(rad/s)  N.m/(rad/s)  N.m/(rad/s)]
+CaWEP=550.00; %total amount of added mass for WEP
+nX=1.75; % multiplier determining how much of the added mass goes on line 'E' (to increase mass MOI of platform)
+mult=[1 10]; %1 = when beam is inside outer shell (same props, no buoyancy), 10 = when beam is inside inner shaft, 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Common Area %%%%%%%%%%%%%%%%%%%%%%%%
+WEPtype='HAN';
+MLname='ML';
+specWEP={''}; % don't treat any of the WEP lines any differently
+nUwep=2; % number of different WEP line types (if set to 2, WEPS 2 and 3 are treated identically)
+if ~iRigid
+    CaCOL=0.90; %surge/sway added mass for columns
+    if strcmp(WEPtype,'PAH')
+        specWEP={'E'};
+    elseif strcmp(WEPtype,'HAN')
+        specWEP={'C'};
+    end
+    nLevel=[1 1 2 1 1]; %{'COL','UMB','LMB','VB','VB'}; 
+else
+    CaCOL=0; % added mass of columns are calculated in WAMIT
+    nLevel=[1 4 4 3 3];% 1 1] ;number of segments per line (NOT sections!!) % usually [1 4 4 3 3]  
+end
+%linenames={'COL','UMB','LMB','VB','VB'}; % working on adding 3 v-braces per side!!

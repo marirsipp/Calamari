@@ -1,0 +1,18 @@
+%%% Github setup!!! :)
+mainDLCs=[160000:30:160180];
+%mainDLCs=[220000:30:220180];
+%mainDLCs=[510000:30:510180 511000:30:511180];
+%mainDLCs=[610000:30:610180]; %6.1!!
+%mainDLCs=[620000:30:620180]; %6.2!!
+%mainDLCs=[620000:30:620180 621000:30:621180 622000:30:622180]; %6.2!!
+%mainDLCs=[710000:30:710180 711000:30:711180 ];
+%mainDLCs=[711000:30:711180 712000:30:712180];
+maindir1='S:\SUP\WFJ_Hitachi5MW\';
+%maindir1='\\POSEIDON\Data\WindFloat Numerical Codes\WindFloat 8MW WFATL\Detailed Design\NEWTOWERTuned - NBC FatRuns\';
+maindir2='\\LEVIATHAN\Data2\WindFloat Numerical Codes\WindFloat 6MW WFNEDO\ORCAFAST Model\';
+rundir=[maindir2 'Runs\'];
+tdir=[maindir2 'Statistics\Seeds\']; %Please create this folder!!
+runPrefix='Run';
+vars2seed={'motionsXY','motionsRXY','basebendXY','basebendRXY','naccelXY','COLtrack','COLtrack','accelXY'};
+how2select={'max','max','max','max','max','max','min','max'};
+iplot=0;% 1 = create lots of plots of the seed selection for manual inspection, %0= don't plot

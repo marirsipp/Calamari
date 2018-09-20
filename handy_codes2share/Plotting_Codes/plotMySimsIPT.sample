@@ -1,0 +1,3 @@
+% Need the WF and turbine dimensions for extraction of displacements, velocities, etc from the .sim
+PtfmName='WFA';  % need dimensions of platform to ping where Orcaflex outputs displacements
+TurbineName='Vestas_8MW';

@@ -1,0 +1,100 @@
+%% Description
+% Depends on seedSelection_BATCH() to generate the OutS structures which
+% are saved in .mat files
+% sdir{1}  = [string], directory where these .mat files are saved
+% if comparing 2 or more different runs with the same DLC number, you can
+% use sdir{2} for the directory of the other .mat files.
+% seedSelection_BATCH() must be called with identical parameters on both of
+% the run folders in order to work properly
+% figdir = [string], directory where you want the generated figures saved
+% lstr = {cell array of strings} = legend entries if length(sdir)>1,
+% ignored otherwise.
+
+%sdir{1}='\\SUP\Longboard\SUP\WFJ_Hitachi5MW\Statistics\Stats\';
+sdir='\\LEVIATHAN\Data2\WindFloat Numerical Codes\WindFloat8MW_WFNL\MooringStudy\Statistics\Stats\';
+%sdir='\\POSEIDON\Data\WindFloat Numerical Codes\WindFloat8MW_WFNL\MooringStudy\Statistics\Stats\';
+lstrs={'Hitachi 5 MW','Senvion 6 MW'}; % Only used for legend entries if length(sdir)>1
+ 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Start DLC Definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+POW_DLCs=[1601090000:30:1601090330];
+POW_Fault_DLCs=[220000:30:220180];
+SDE_DLCs=[510000:30:510180 511000:30:511180];
+PAR_DLCs=[6101090000:30:6101090330];
+PAR_nacyaw_DLCs=[620000:30:620180 621000:30:621180 622000:30:622180];
+NacYaw_DLCs=[620000:30:620180];
+NacYaw4_DLCs=[624000:30:624180];
+PAR_Fault_DLCs=[710000:30:710180 711000:30:711180]; %[712000:30:712180];%
+Yr50_DLCs=[PAR_DLCs NacYaw_DLCs];
+
+Norm_DLCs=[POW_DLCs PAR_DLCs SDE_DLCs]; %
+Abnorm_DLCs=[POW_Fault_DLCs NacYaw_DLCs PAR_Fault_DLCs]; % %
+
+NormRedo_DLCs=[POW_DLCs PAR_DLCs];
+AbnormRedo_DLCs=[NacYaw_DLCs PAR_Fault_DLCs];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%% End DLC Definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%Start Plot Definitions %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+DLC2plt='POW'; %DLC2plt='POW'; %'Norm', 'Abnorm', 'PAR', make it match the foobar_DLCs you  want to plot.
+vars2plot='motions';
+how2seed='max';
+
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%% Overview of Results %%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% %% Fig 19 - Power production DLCs: Basebend RXY
+% % 1.1, 1.3, 1.4, 1.5, 1.60
+% DLC2plt='POW';
+% vars2plot={'MaxAnchorEffT','motionsXY','basebendRXY','motionsRXY'};
+%  %% Fig 20 - 1.6 DLCs: Basebend RXY
+% % 1.60,1.61,1.66,1.67
+% 
+% % See Figure 19
+% 
+% %% Fig 21 - Power Production w/ Fault: Basebend RXY
+% % 2.20,2.21,2.22,2.23,2.24,2.25,2.30
+% DLC2plt='POW_Fault';
+% vars2plot={'basebendRXY','motionsRXY'};
+%     case 'POW_Fault'
+% %% Fig 22 - Start-up and Shutdown: Basebend RXY
+% % 3.20,3.21,3.22,3.30,3.31,3.32,5.10
+% DLC2plt='SDE';
+% vars2plot={'basebendRXY','motionsRXY'};
+% %% Fig 23 - Normal and Emergency Shutdown: Basebend RXY
+% % 4.20,4.21,4.22,5.10
+% 
+% %N/A
+% 
+% %% Fig 24 - Parked, 50 Yr storm: Basebend RXY
+% % 6.10,6.16,6.17,6.18,6.19
+% DLC2plt='PAR';
+% vars2plot={'basebendRXY','motionsRXY'};
+% %% Park Pry and Squeeze    
+% DLC2plt = 'PAR_PS';
+% %% Fig 25 - Parked, vary wind gusts: Basebend RXY
+% % 6.10,6.30,6.31,6.32,6.33
+% 
+% 
+% % See Figure 24
+% 
+% 
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%% Appendices %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% 
+% %% Fig 29 - Normal SF: basebend RXY
+% % 1.60, 6.10 6.14, 6.15, 5.10
+% 
+% % plotLikeAlan(AllData,Norm_DLCs,{'basebendRXY'},{'basebendRXY'},{'NormNo16'})
+% %plotWithBars(AllData,Norm_DLCs,{'basebendRXY'},{'basebendRXY'},{'Norm'})
+% %% Fig 30 - Abnormal SF: basebend RXY
+% % 6.20, 6.21, 8.20, 7.11
+% 
+% % Abnorm_DLCs
+% %plotLikeAlan(AllData,Abnorm_DLCs,{'basebendRXY'},{'basebendRXY'},{'Abnorm'})
+% %% Table 18 - Air Gap, Probes 1:12
+% % 1.60, 2.30, 8.20, 7.10, 7.11, 6.10, 6.11, 6.12, 6.13, 6.14, 6.15, 6.20,
+% % 6.21, 5.10, 
+% DLC2plot='Yr50';
+% vars2plot='COLtrack';
+%

@@ -1,0 +1,4 @@
+RunStr='Run';%, 'Run', Beginning of Run Name
+nSeeds = 6;%[integer], Number of seeds per bin
+t_trans = 400;% Time to begin analyzing the time series (time at which transient ends)
+LineNames = {'LMB','VB','UMB'};%, Array of strings of the beginning of the lines to output the forces

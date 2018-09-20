@@ -1,0 +1,52 @@
+%%%%%%%%%%%% buildWF Input file %%%%%%%%%%%%%
+
+%% Naming Variables
+PtfmType='WFM';
+TurbineType='GEAlstom_6MW';
+datfileIN='S:\SUP\WFM_Alstom6MW\Input_OrcaFlex\Iteration10_Flexible.dat';
+datfileOUT='S:\SUP\WFM_Alstom6MW\Input_OrcaFlex\Iteration10_Flexible.dat';
+OFver=10.1;
+MLname='ML';
+
+%% Logicals
+iRigid=0; %if building flexible model (=0), must use OrcaFlex 10.0+ to connect lines to lines
+iAdamantium=0; %if set to 1, then lines are ultra-rigid, 1000x stiffer than steel (like Wolverine's claws)
+iplot=0; % make some pretty 3D plots along the way
+iTower=1; % if TRUE, then builds the tower; if FALSE, then splits the weight of the tower in the ballasts of cols2+3
+iRNA = 1; % if True, then builds the RNA
+iBlades = 1; % if True, then builds/modifies the blades
+iWEP=1;
+iOF=1; % actually call the OrcaFlex/MATLAB interface (only used for debugging)
+
+%% WEP
+WEPtype='HAN';
+CdWEP=3; % drag coefficient of the WEP plate (F_vertical = .5*rho*Cd*A_wep*U|U|)
+CaWEP=1000.00; %total amount of added mass for WEP (should be equal to long-wave limit
+nX=1.75; % multiplier determining how much of the added mass goes on line 'specWEP' (to change mass MOI of platform)
+specWEP={''}; % don't treat any of the WEP lines any differently
+nUwep=2; % number of different WEP line types (if set to 2, WEPS 2 and 3 are treated identically)
+WEPD=.305; % How to get buoyancy of WEP?
+CdDiam=.305; %[m] Isn't this arbitrary?!?
+
+%% Mooring
+iAlignMoor=0;
+iBuildMoor=1; % will only work if there is a mooring tab in the WindFloatX spreadsheet and the linetypes exist in the Model
+%% PARAMETERS
+X1=[0 0 0]; %location of Col1 center
+
+if ~iRigid
+    %% Flexible Parameters
+    Emult=[1 10]; %1 = when beam is inside outer shell (same props, no buoyancy), 10 = when beam is inside inner shaft, 
+    CaCOL=0.90; %surge/sway added mass for columns
+    if strcmp(WEPtype,'PAH')
+        specWEP={'E'};
+    elseif strcmp(WEPtype,'HAN')
+        specWEP={'C'};
+    end
+    nLevel=[1 1 2 1 1]; %{'COL','UMB','LMB','VB','VB'}; 
+else
+    Emult=1;
+    CaCOL=0; % added mass of columns are calculated in WAMIT
+    nLevel=[1 4 4 3 3];% 1 1] ;number of segments per line (NOT sections!!) % usually [1 4 4 3 3]  
+end
+linenames={'COL','UMB','LMB','VB','VB'}; % working on adding 3 v-braces per side!!

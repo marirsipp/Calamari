@@ -1,0 +1,13 @@
+/handy_codes_byOthers/temp_in*.dat
+/handy_codes_byOthers/temp_out*.dat
+*.asv
+*.tmp
+*~
+/.project
+*IPT.m
+*ipt.m
+*Ipt.m
+~*
+*.cache
+/ThreeD/**/*.txt
+/ThreeD/**/*.ide

@@ -1,0 +1,2 @@
+*.xls diff=excel_cmp
+*.xlsx diff=excel_cmp
