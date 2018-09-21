@@ -1,0 +1,83 @@
+FINISH
+/post1
+set,last  !! result set to be used
+
+!---------Input----------------------------------------------------------------
+LocSys = 13                   !! node location coordinate system
+CMSEL,S,INP_Face_interface           !! select faces for Node output
+!---------Input----------------------------------------------------------------
+
+*get,nnum ,Node,,Count  !! get number of selected nodes
+*dim,out,Array,nnum,4   !! create an array
+a = 0                   !! define a parameter
+
+*do,i,1,nnum            !! initiate a loop on selected nodes
+
+a = NDNEXT(a)           !! get the next higher node number in selected set
+out(i,1) = a            !! store the node number in first column of array
+
+csys, LocSys 
+
+*get,xloc,Node,a,loc,x  !! get x coordinate of node
+*get,yloc,Node,a,loc,y  !! get y coordinate of node
+*get,zloc,Node,a,loc,z  !! get z coordinate of node
+
+out(i,2) = xloc         !! store the x coordinate in second column of array
+out(i,3) = yloc         !! store the y coordinate in third column of array
+out(i,4) = zloc         !! store the z coordinate in fourth column of array
+
+*enddo                  !! end the loop
+
+!---------Input----------------------------------------------------------------
+*cfopen, NodeLoc_OSWEP,csv  !! create a csv file
+!---------Input----------------------------------------------------------------
+
+*Vwrite,'Node_num',',','X-cord',',','Y-cord',',','Z-cord'
+(A8,A1,A6,A1,A6,A1,A6)
+*Vwrite,out(1,1),',',out(1,2),',',out(1,3),',',out(1,4)
+(F15.3,A1,f15.3,A1,f15.3,A1,f15.3) 
+*cfclose  !! close the csv file after writing the required data
+
+!---------Input----------------------------------------------------------------
+CMSEL,S,INP_Elem_interface           !! select elements for Node output
+!---------Input----------------------------------------------------------------
+
+*get,enum,Elem,,Count   !! get number of selected elements
+*dim,out2,Array,enum,5  !! create an array
+b = 0                   !! define a parameter
+
+*do,i,1,enum            !! initiate a loop on selected elements
+b = ELNEXT(b)           !! get the next higher element number in selected set
+out2(i,5) = b            !! store the element number in 14th column of array
+
+*get,NodeNo1,Elem,b,NODE,1 !!get the first node number of the current element
+*get,NodeNo2,Elem,b,NODE,2 !!get the second node number of the current element
+*get,NodeNo3,Elem,b,NODE,3 !!get the third node number of the current element
+*get,NodeNo4,Elem,b,NODE,4 !!get the fourth node number of the current element
+
+out2(i,1) = NodeNo1         !! store the first node number of the current element
+out2(i,2) = NodeNo2         !! store the second node number of the current element
+out2(i,3) = NodeNo3         !! store the third node number of the current element
+out2(i,4) = NodeNo4         !! store the fourth node number of the current element
+
+!out2(i,5) = 0
+!out2(i,6) = 0
+!out2(i,7) = 0
+!out2(i,8) = 0
+!out2(i,9) = 0
+!out2(i,10) = 0
+!out2(i,11) = 0
+!out2(i,12) = 0
+!out2(i,13) = 0
+
+*enddo                   !! end the loop
+
+!---------Input----------------------------------------------------------------
+*cfopen, ElemNode_OSWEP,csv  !! create a csv file
+!---------Input----------------------------------------------------------------
+
+*Vwrite,'NodeNo1',',','NodeNo2',',','NodeNo3',',','NodeNo4',',','ElemNo'
+(A7,A1,A7,A1,A7,A1,A7,A1,A6)
+*Vwrite,out2(1,1),',',out2(1,2),',',out2(1,3),',',out2(1,4),',',out2(1,5)
+(F15.3,A1,f15.3,A1,f15.3,A1,f15.3,A1,f15.3) 
+*cfclose  !! close the csv file after writing the required data

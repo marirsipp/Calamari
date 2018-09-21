@@ -1,0 +1,115 @@
+!   Commands inserted into this file will be executed immediately after the ANSYS /POST1 command.
+
+!   Active UNIT system in Workbench when this object was created:  Metric (mm, kg, N, s, mV, mA)
+!   NOTE:  Any data that requires units (such as mass) is assumed to be in the consistent solver unit system.
+!                See Solving Units in the help system for more information.
+RESUME
+*DIM,OutFile1,STRING,150
+*DIM,OutFile2,STRING,150
+
+!!-----INPUTs------------------------------------------------------------------
+BodyName = 'LMB_Nominal'
+CMSEL, S, OUT_LMB_Nominal, ELEM               !! Select component in elements
+!LocSys = 12                              !! Element centroid location coordinate system
+!SolSys = 12                              !! solution coordinate system
+!!-----INPUTs------------------------------------------------------------------
+
+!csys, LocSys
+!rsys, SolSys 
+
+*GET,Enum ,ELEM,,COUNT                     !! get number of selected Elements
+*Get,LstepN, ACTIVE, , SOLU, NCMLS         !! Get the current load step
+
+*DO,k,1,LstepN
+
+  SET, k, LAST                    !! read results from load step K
+
+  *IF,k,LE,StepChg,THEN
+   Pcrnt = Pzero+(k-1)*DeltaP1            !! Calculate the current period
+  *ELSE
+   Pcrnt = Pzero+(StepChg-1)*DeltaP1+(k-StepChg)*DeltaP2
+  *ENDIF      
+  
+  P_n =  CHRVAL(Pcrnt)
+
+  !ETABLE, ElemFx, F,X             
+  !ETABLE, ElemFy, F,Y
+  !ETABLE, ElemFz, F,Z
+
+  SHELL, TOP                     !! Specify output layer, top,bot,mid
+  ETABLE, ElemSxt, S,x
+  ETABLE, ElemSyt, S,y
+  ETABLE, ElemSzt, S,z
+  ETABLE, ElemSxyt, S,xy
+  ETABLE, ElemSyzt, S,yz
+  ETABLE, ElemSxzt, S,xz
+  
+  SHELL, BOT                     !! Specify output layer, top,bot,mid
+  ETABLE, ElemSxb, S,x
+  ETABLE, ElemSyb, S,y
+  ETABLE, ElemSzb, S,z
+  ETABLE, ElemSxyb, S,xy
+  ETABLE, ElemSyzb, S,yz
+  ETABLE, ElemSxzb, S,xz
+
+  *DIM,ElemRst,ARRAY,Enum,16       !! create an array
+  b = 0                           !! define a parameter
+   
+  *DO,i,1,Enum                     !! initiate a loop on selected nodes
+
+   b = ELNEXT(b)                  !! get the next higher element number in selected set
+   ElemRst(i,1) = b                !! store the element number in first column of array
+
+   ElemRst(i,2) = CENTRX(b)        !! Element centroid x, in active coordinate system
+   ElemRst(i,3) = CENTRY(b)        !! Element centroid y, in active coordinate system
+   ElemRst(i,4) = CENTRZ(b)        !! Element centroid z, in active coordinate system
+   
+   !*GET,ElemRst(i,5),ELEM,b,ETAB,ElemFx      !! get total force Fx of element b
+   !*GET,ElemRst(i,6),ELEM,b,ETAB,ElemFy      !! get total force Fx of element b
+   !*GET,ElemRst(i,7),ELEM,b,ETAB,ElemFz      !! get total force Fx of element b
+ 	  
+   *GET,ElemRst(i,5),ELEM,b,ETAB,ElemSxt    !! get directional stress of element b, top surface
+   *GET,ElemRst(i,6),ELEM,b,ETAB,ElemSyt
+   *GET,ElemRst(i,7),ELEM,b,ETAB,ElemSzt   
+   *GET,ElemRst(i,8),ELEM,b,ETAB,ElemSxyt
+   *GET,ElemRst(i,9),ELEM,b,ETAB,ElemSyzt
+   *GET,ElemRst(i,10),ELEM,b,ETAB,ElemSxzt
+   
+   *GET,ElemRst(i,11),ELEM,b,ETAB,ElemSxb    !! get directional stress of element b, btm surface
+   *GET,ElemRst(i,12),ELEM,b,ETAB,ElemSyb
+   *GET,ElemRst(i,13),ELEM,b,ETAB,ElemSzb   
+   *GET,ElemRst(i,14),ELEM,b,ETAB,ElemSxyb
+   *GET,ElemRst(i,15),ELEM,b,ETAB,ElemSyzb
+   *GET,ElemRst(i,16),ELEM,b,ETAB,ElemSxzb  
+
+  *ENDDO
+
+  !LS_n = CHRVAL(k)
+  !filename1 = STRCAT('Elem_F',LS_n)
+  !*cfopen, %filename1%,csv  !! create a csv file
+  !*Vwrite,'Elem_num',',','x(mm)',',','y(mm)',',','z(mm)',',','Fx(N)',',','Fy(N)',',','Fz(N)'
+  !(A8,A1,A5,A1,A5,A1,A5,A1,A5,A1,A5,A1,A5)
+  !*Vwrite,ElemRst(1,1),',',ElemRst(1,2),',',ElemRst(1,3),',',ElemRst(1,4),',',ElemRst(1,5),',',ElemRst(1,6),',',ElemRst(1,7)
+  !(F15.3,A1,f15.3,A1,f15.3,A1,f15.3,A1,f15.3,A1,f15.3,A1,f15.3)
+  !*cfclose  !! close the csv file after writing the required data 
+
+  OutFile1(1) = '%path2(1)%\ElemStr_%BodyName%_%Headng%T%P_n%_%RorIm%_Top'
+  *cfopen, %OutFile1(1)%,csv  !! create a csv file
+  *Vwrite,'Elem_num',',','x(m)',',','y(m)',',','z(m)',',','Sxt_Pa',',','Syt_Pa',',','Szt_Pa',',','Sxyt_Pa',',','Syzt_Pa',',','Sxzt_Pa'
+  (A8,A1,A4,A1,A4,A1,A4,A1,A6,A1,A6,A1,A6,A1,A7,A1,A7,A1,A7)
+  *Vwrite,ElemRst(1,1),',',ElemRst(1,2),',',ElemRst(1,3),',',ElemRst(1,4),',',ElemRst(1,5),',',ElemRst(1,6),',',ElemRst(1,7),',',ElemRst(1,8),',',ElemRst(1,9),',',ElemRst(1,10)
+  (F15.3,A1,f15.3,A1,f15.3,A1,f15.3,A1,e15.3,A1,e15.3,A1,e15.3,A1,e15.3,A1,e15.3,A1,e15.3)
+  *cfclose  !! close the csv file after writing the required data
+  
+  OutFile2(1) = '%path2(1)%\ElemStr_%BodyName%_%Headng%T%P_n%_%RorIm%_Btm'
+  *cfopen, %OutFile2(1)%,csv  !! create a csv file
+  *Vwrite,'Elem_num',',','x(m)',',','y(m)',',','z(m)',',','Sxb_Pa',',','Syb_Pa',',','Szb_Pa',',','Sxyb_Pa',',','Syzb_Pa',',','Sxzb_Pa'
+  (A8,A1,A4,A1,A4,A1,A4,A1,A6,A1,A6,A1,A6,A1,A7,A1,A7,A1,A7)
+  *Vwrite,ElemRst(1,1),',',ElemRst(1,2),',',ElemRst(1,3),',',ElemRst(1,4),',',ElemRst(1,11),',',ElemRst(1,12),',',ElemRst(1,13),',',ElemRst(1,14),',',ElemRst(1,15),',',ElemRst(1,16)
+  (F15.3,A1,f15.3,A1,f15.3,A1,f15.3,A1,e15.3,A1,e15.3,A1,e15.3,A1,e15.3,A1,e15.3,A1,e15.3)
+  *cfclose  !! close the csv file after writing the required data
+
+*ENDDO
+
+
+

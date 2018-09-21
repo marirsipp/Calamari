@@ -1,0 +1,45 @@
+!   Commands inserted into this file will be executed just prior to the ANSYS SOLVE command.
+!   These commands may supersede command settings set by Workbench.
+
+!   Active UNIT system in Workbench when this object was created:  Metric (mm, kg, N, s, mV, mA)
+!   NOTE:  Any data that requires units (such as mass) is assumed to be in the consistent solver unit system.
+!                See Solving Units in the help system for more information.
+
+
+*DIM,path0,STRING,100    !! General path
+*DIM,path1,STRING,100    !! Load files path
+*DIM,path2,STRING,100    !! Result files path
+*DIM,LoadFile,STRING,100
+
+!================================INPUT==============================================
+path0(1) = ('D:\Bingbin\Models\@Round5_WFA\Itr16_FreqDm_Detail\Loads_Jul212017') !! General path, where load and results are stored
+
+Headng = ('Run210')    !! Current heading
+
+Pzero = 3            !! Starting period, s
+DeltaP1 = 1          !! Period interval, s
+DeltaP2 = 5          !! 2nd period interval, s
+StepChg = 35         !! Timestep number when deltaP changes
+
+RorIm = 'real'       !! Real or imaginary load, 'real' or 'imag'
+ExtNm = 'dat'        !! Extension of the load file, total load - 'dat'; hydrodynamic pressure - 'phyd';
+                     !! diffraction pressure - 'pdif', radiation pressure - 'prad'
+LdFile = 'Itr16_7_2_LMB'    !! Load file name
+!================================INPUT==============================================
+
+path2(1) = '%path0(1)%\Results\%Headng%'     !! Folder for storing result files per heading
+
+*Get,CrntStep, ACTIVE, , SOLU, NCMLS         !! Get load step number before current load step
+LS_n = CHRVAL(CrntStep+1)                    !! Convert current load step number to strings
+
+*IF,CrntStep,LT,StepChg,THEN               !! If the current time step is below the timestep number when deltaP changes
+ Pcrnt = Pzero+CrntStep*DeltaP1            !! Calculate the current period
+*ELSE
+ Pcrnt = Pzero+(StepChg-1)*DeltaP1+(CrntStep-StepChg+1)*DeltaP2   !! Calculate the current period, with deltaP2
+*ENDIF      
+
+P_n =  CHRVAL(Pcrnt)
+LoadFile(1) = '%LdFile%_%RorIm%'                    !! Load file name
+path1(1) = '%path0(1)%\%Headng%\Period%P_n%\'       !! Load file path name
+
+/INPUT, '%LoadFile(1)%','%ExtNm%','%path1(1)%',,0   !! Input the load file into the run

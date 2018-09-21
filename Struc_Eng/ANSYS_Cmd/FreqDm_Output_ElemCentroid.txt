@@ -1,0 +1,40 @@
+!   Commands inserted into this file will be executed immediately after the ANSYS /POST1 command.
+
+!   Active UNIT system in Workbench when this object was created:  Metric (mm, kg, N, s, mV, mA)
+!   NOTE:  Any data that requires units (such as mass) is assumed to be in the consistent solver unit system.
+!                See Solving Units in the help system for more information.
+
+
+FINISH
+/post1
+set,last  !! result set to be used
+
+!---------Input----------------------------------------------------------------
+LocSys = 13                   !! node location coordinate system
+CMSEL,S,INP_Elem_interface    !! select faces for Element output
+!---------Input----------------------------------------------------------------
+
+*get,enum,Elem,,Count         !! get number of selected elements
+*dim,ElemRst,Array,enum,4     !! create an array
+b = 0                         !! define a parameter
+
+*DO,i,1,Enum                       !! initiate a loop on selected elements
+
+   b = ELNEXT(b)                   !! get the next higher element number in selected set
+   ElemRst(i,1) = b                !! store the element number in first column of array
+
+   ElemRst(i,2) = CENTRX(b)        !! Element centroid x, in global coordinate system
+   ElemRst(i,3) = CENTRY(b)        !! Element centroid y, in global coordinate system
+   ElemRst(i,4) = CENTRZ(b)        !! Element centroid z, in global coordinate system
+
+*ENDDO
+
+!---------Input----------------------------------------------------------------
+*cfopen, ElemLoc_OSWEP,csv  !! create a csv file
+!---------Input----------------------------------------------------------------
+
+*Vwrite,'ElemNo',',','X(mm)',',','Y(mm)',',','Z(mm)'
+(A6,A1,A5,A1,A5,A1,A5)
+*Vwrite,ElemRst(1,1),',',ElemRst(1,2),',',ElemRst(1,3),',',ElemRst(1,4)
+(F15.3,A1,f15.3,A1,f15.3,A1,f15.3) 
+*cfclose  !! close the csv file after writing the required data
